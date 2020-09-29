@@ -1,0 +1,21 @@
+---
+title: "p8105_hw2_ms5965"
+output: github_document
+---
+
+Loading the libraries:
+
+```{r setup, eval = FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+Importing and storing datasets:
+
+```{r Importing and storing data, eval = FALSE}
+trash_wheel_data = read_xlsx("./data/trash_wheel_data.xlsx")
+trash_wheel_data = janitor::clean_names(trash_wheel_data)
+
+NYC_subway_data = read_csv("./data/NYC_subway_data.csv")
+NYC_subway_data = janitor::clean_names(NYC_subway_data)
+```
