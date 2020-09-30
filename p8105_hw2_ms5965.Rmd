@@ -164,3 +164,27 @@ A_ADA = filter(A_stations, ada == TRUE)
 ```
 
 There are `r nrow(A_stations)` distinct stations serving the A train. Of these stations, `r nrow(A_ADA)` are ADA compliant. 
+
+
+## Problem 3
+
+Cleaning the pols-month data:
+
+```{r}
+pols_month = read_csv(file = "./data/pols-month.csv") %>% 
+  
+  janitor::clean_names() %>% 
+  
+  separate(mon, into = c("year", "month", "day")) %>% 
+  
+  mutate(
+    month = as.numeric(month),
+    month = month.name[month],
+    president = recode(prez_gop, `1` = "gop", `2` = "gop",`0` = "dem")) %>% 
+  
+  select(year, month, -day, -prez_dem, -prez_gop, everything()) %>% 
+  arrange(year, month)
+```
+
+
+
