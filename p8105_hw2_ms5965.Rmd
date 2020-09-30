@@ -1,21 +1,78 @@
 ---
 title: "p8105_hw2_ms5965"
+author: "Mehr Shafiq"
 output: github_document
 ---
 
 Loading the libraries:
 
-```{r setup, eval = FALSE}
+```{r setup, }
 library(tidyverse)
 library(readxl)
 ```
 
-Importing and storing datasets:
+## Problem 1
 
-```{r Importing and storing data, eval = FALSE}
-trash_wheel_data = read_xlsx("./data/trash_wheel_data.xlsx")
-trash_wheel_data = janitor::clean_names(trash_wheel_data)
+Defining a path to the dataset
 
-NYC_subway_data = read_csv("./data/NYC_subway_data.csv")
-NYC_subway_data = janitor::clean_names(NYC_subway_data)
+```{r Importing data}
+path_to_data = "./data/trash_wheel_data.xlsx"
 ```
+
+Reading Mr Trashwheel Data
+
+```{r}
+trashwheel_df = 
+	read_xlsx(
+		path = path_to_data,
+		sheet = "Mr. Trash Wheel",
+		range = cell_cols("A:N")) %>% 
+	janitor::clean_names() %>% 
+	drop_na(dumpster) %>% 
+	mutate(
+		sports_balls = round(sports_balls),
+		sports_balls = as.integer(sports_balls)
+	)
+```
+Reading and cleaning precipitation data for 2017 & 2018
+
+```{r}
+prec_17 = 
+  read_excel(
+    path = path_to_data,
+    sheet = "2017 Precipitation",
+    skip = 1) %>% 
+  
+  janitor::clean_names() %>% 
+  drop_na(month) %>% 
+  mutate(year = 2017) %>% 
+  relocate (year)
+
+prec_18 = 
+  read_excel(
+    path = path_to_data,
+    sheet = "2018 Precipitation",
+    skip = 1) %>% 
+  
+  janitor::clean_names() %>% 
+  drop_na(month) %>% 
+  mutate(year = 2018) %>% 
+  relocate (year)
+```
+
+Combining 2017 & 2018 Precipitation Datasets
+
+```{r}
+month_df = 
+	tibble(
+		month = 1:12,
+		month_name = month.name
+	)
+
+prec_17_18 = bind_rows(prec_17, prec_18) 
+
+prec_17_18 = left_join(prec_17_18, month_df, by = "month")
+```
+
+
+
