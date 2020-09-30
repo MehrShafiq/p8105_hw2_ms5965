@@ -209,5 +209,33 @@ snp_data = read_csv(file = "./data/snp.csv") %>%
   
 ```
 
-SNP - Standard & Poor's stock market index (S&P) data is used as a representative measure of stock market as a whole. This dataset had two variables: date and close (the closing values of the S&P stock index on the associated date), and `r ncol(snp_data observations`.
+SNP - Standard & Poor's stock market index (S&P) data is used as a representative measure of stock market as a whole. This dataset had two variables: date and close (the closing values of the S&P stock index on the associated date), and `r ncol(snp_data)` observations.
+
+Cleaning the unemployement data:
+
+```{r}
+unemployment_data = read_csv(file = "./data/unemployment.csv") %>% 
+  
+  janitor::clean_names()
+  
+tidy_unemployment = unemployment_data %>% 
+  pivot_longer(
+    jan:dec,
+    names_to = "month",
+    values_to = "unemployment"
+  ) %>% 
+    
+  mutate(
+    month = recode(month, "may" = "May"),
+    month = tools::toTitleCase(month),
+    month = match(month, month.abb),
+    month = as.numeric(month),
+    month = month.name[month]) %>% 
+
+  select(year, month, everything()) %>% 
+    
+  arrange(year, month)
+```
+
+This dataset contains the percentage of employment per month in a particular year. It contains the variables: year, month and umployment (%). The cleaned version of the dataset has `r ncol(tidy_unemployment)` observations.
 
