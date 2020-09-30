@@ -76,3 +76,18 @@ prec_17_18 = left_join(prec_17_18, month_df, by = "month")
 
 This dataset contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland. As trash enters the inner harbor, the trashwheel collects that trash, and stores it in a dumpster. The dataset contains information on year, month, and trash collected, include some specific kinds of trash. There are a total of `r nrow(trashwheel_df)` observations in our final dataset. Additional data sheets include month precipitation data. The median number of sports balls found in a dumpster in 2017 was `r trashwheel_df %>% filter(year == 2017) %>% pull(sports_balls) %>% median()`. The total precipitation in 2018 was `r prec_17_18 %>% filter(year == 2018) %>% pull(total) %>% sum()` inches.
 
+
+## Problem 2
+
+Defining a path to the dataset, then cleaning it..
+
+```{r}
+path_to_NYC_data = read_csv(file = "./data/NYC_subway_data.csv") %>% 
+janitor::clean_names() 
+  
+subset = c("line", "entrance_latitude", "entrance_longitude", "route1", "route2", "route3", "route4", "route5", "route6", "route7", "route8", "route9", "route10", "route11", "entry", "vending", "entrance_type", "ada", "station_name")
+
+subset_NYC_data = path_to_NYC_data[subset]
+
+```
+
