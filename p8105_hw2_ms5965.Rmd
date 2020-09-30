@@ -4,7 +4,7 @@ author: "Mehr Shafiq"
 output: github_document
 ---
 
-Loading the libraries:
+Loading libraries.
 
 ```{r setup, }
 library(tidyverse)
@@ -13,15 +13,15 @@ library(readxl)
 
 ## Problem 1
 
-Defining a path to the dataset
+Defining a path to the dataset.
 
 ```{r Importing data}
 path_to_data = "./data/trash_wheel_data.xlsx"
 ```
 
-Reading Mr Trashwheel Data
+Reading Mr Trashwheel Data.
 
-```{r}
+```{r cleaning trashwheel}
 trashwheel_df = 
 	read_xlsx(
 		path = path_to_data,
@@ -31,12 +31,11 @@ trashwheel_df =
 	drop_na(dumpster) %>% 
 	mutate(
 		sports_balls = round(sports_balls),
-		sports_balls = as.integer(sports_balls)
-	)
+		sports_balls = as.integer(sports_balls))
 ```
 Reading and cleaning precipitation data for 2017 & 2018
 
-```{r}
+```{r cleaning precipitation}
 prec_17 = 
   read_excel(
     path = path_to_data,
@@ -58,21 +57,22 @@ prec_18 =
   drop_na(month) %>% 
   mutate(year = 2018) %>% 
   relocate (year)
+
 ```
 
 Combining 2017 & 2018 Precipitation Datasets
 
-```{r}
+```{r combining precipitaion ds}
 month_df = 
 	tibble(
 		month = 1:12,
-		month_name = month.name
-	)
+		month_name = month.name)
 
 prec_17_18 = bind_rows(prec_17, prec_18) 
 
 prec_17_18 = left_join(prec_17_18, month_df, by = "month")
+
 ```
 
-
+This dataset contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland. As trash enters the inner harbor, the trashwheel collects that trash, and stores it in a dumpster. The dataset contains information on year, month, and trash collected, include some specific kinds of trash. There are a total of `r nrow(trashwheel_df)` observations in our final dataset. Additional data sheets include month precipitation data. The median number of sports balls found in a dumpster in 2017 was `r trashwheel_df %>% filter(year == 2017) %>% pull(sports_balls) %>% median()`. The total precipitation in 2018 was `r prec_17_18 %>% filter(year == 2018) %>% pull(total) %>% sum()` inches.
 
