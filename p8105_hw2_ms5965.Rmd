@@ -87,7 +87,29 @@ janitor::clean_names()
   
 subset = c("line", "entrance_latitude", "entrance_longitude", "route1", "route2", "route3", "route4", "route5", "route6", "route7", "route8", "route9", "route10", "route11", "entry", "vending", "entrance_type", "ada", "station_name")
 
-subset_NYC_data = path_to_NYC_data[subset]
+subset_NYC_data = path_to_NYC_data[subset] %>% 
+  
+mutate(
+  entry = ifelse(entry == "YES", TRUE, FALSE)) %>% 
+  
+mutate_at(vars(route1:route11), as.character) %>%
 
+pivot_longer(
+    route1:route11, 
+    names_to = "route_name",
+    names_prefix = "route",
+    values_to = "route_number") %>% 
+drop_na(route_number)
 ```
+This dataset contains information on the NYC Transit - with respect to the entrance, exit, routes, lines and ADA compliance for each subway in the city. 
+
+The unadulterated dataset was cleaned in the following steps:
+*   A subset of the dataset with only relevant variables was created.
+*   The 'entry' variable which had YES & NO values was converted into a logical variables where YES -> TRUE and NO -> FALSE. 
+*   The multiple route names (route1 to route11) were all converted in the same type of variable, that is, character variable.
+*   The originally wide dataset was changed into a long table where the umbrella variable "route_name" stores all the route numbers. 
+
+This data has `r ncol(subset_NYC_data)` variables and `r nrow(subset_NYC_data)` observations. 
+
+This dataset is tidy. 
 
