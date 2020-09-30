@@ -85,14 +85,60 @@ Defining a path to the dataset, then cleaning it..
 path_to_NYC_data = read_csv(file = "./data/NYC_subway_data.csv") %>% 
 janitor::clean_names() 
   
-subset = c("line", "entrance_latitude", "entrance_longitude", "route1", "route2", "route3", "route4", "route5", "route6", "route7", "route8", "route9", "route10", "route11", "entry", "vending", "entrance_type", "ada", "station_name")
+subset_NYC_data = path_to_NYC_data %>% 
+  
+  select(line, entrance_latitude, entrance_longitude, route1:route11, entry, vending, entrance_type, ada, station_name, exit_only) %>% 
+  
+mutate(entry = ifelse(entry == "YES", TRUE, FALSE)) 
+  
+```
+This dataset contains information on the NYC Transit - with respect to their entrance, exit, routes, lines and ADA compliance for each subway in the city. 
 
-subset_NYC_data = path_to_NYC_data[subset] %>% 
-  
-mutate(
-  entry = ifelse(entry == "YES", TRUE, FALSE)) %>% 
-  
-mutate_at(vars(route1:route11), as.character) %>%
+The unadulterated dataset was cleaned in the following steps:
+*   A subset of the dataset with only relevant variables was created.
+*   The 'entry' variable which had YES & NO values was converted into a logical variables where YES -> TRUE and NO -> FALSE. 
+
+This data has `r ncol(subset_NYC_data)` variables and `r nrow(subset_NYC_data)` observations. 
+
+This dataset is not tidy. 
+
+#### Problem 2: Questions
+
+##### Part A: 
+
+```{r}
+distinct_stations = distinct(subset_NYC_data, line, station_name, .keep_all = TRUE) %>% 
+  arrange(station_name, line)
+```
+
+There are `r nrow(distinct_stations)` distinct stations by name and line in NYC. 
+
+
+##### Part B: 
+
+```{r}
+ADA_compliant = filter(subset_NYC_data, ada == TRUE)
+```
+
+`r nrow(ADA_compliant)` stations are ADA compliant.
+
+
+##### Part C: 
+
+```{r}
+vendor_data = filter(subset_NYC_data, vending == "YES") %>% 
+  count(entry)
+
+vendor_data 
+```
+
+`r vendor_data[2,2]` out of `r sum(vendor_data$n)` stations with vending allow entrance. 
+
+
+#### Tidying the dataframe
+
+```{r}
+tidy_data = mutate_at(subset_NYC_data, vars(route1:route11), as.character) %>%
 
 pivot_longer(
     route1:route11, 
@@ -100,16 +146,21 @@ pivot_longer(
     names_prefix = "route",
     values_to = "route_number") %>% 
 drop_na(route_number)
+
 ```
-This dataset contains information on the NYC Transit - with respect to the entrance, exit, routes, lines and ADA compliance for each subway in the city. 
-
-The unadulterated dataset was cleaned in the following steps:
-*   A subset of the dataset with only relevant variables was created.
-*   The 'entry' variable which had YES & NO values was converted into a logical variables where YES -> TRUE and NO -> FALSE. 
 *   The multiple route names (route1 to route11) were all converted in the same type of variable, that is, character variable.
-*   The originally wide dataset was changed into a long table where the umbrella variable "route_name" stores all the route numbers. 
+*   The originally wide dataframe was changed into a long table where the umbrella variable "route_name" stores all the route numbers. 
 
-This data has `r ncol(subset_NYC_data)` variables and `r nrow(subset_NYC_data)` observations. 
+This dataframe is tidy now.
 
-This dataset is tidy. 
+##### A train
 
+```{r}
+A_train = filter(tidy_data, route_number == "A") 
+
+A_stations = distinct(A_train, station_name, .keep_all = TRUE)
+
+A_ADA = filter(A_stations, ada == TRUE)
+```
+
+There are `r nrow(A_stations)` distinct stations serving the A train. Of these stations, `r nrow(A_ADA)` are ADA compliant. 
