@@ -187,7 +187,7 @@ pols_month = read_csv(file = "./data/pols-month.csv") %>%
   arrange(year, month)
 ```
 
-This dataset contained variables related to the number of national politicians who are demogratic or republican at any given time --> these variables included year, president of that year (democratic or republican), governors, and senators. This cleaned dataset has `r nrow(pols_month)` variabels and `r ncol(pols_month)` observations. 
+This dataset contained variables related to the number of national politicians who are democratic or republican at any given time --> these variables included year, president of that year (democratic or republican), governors, and senators. This cleaned dataset has `r ncol(pols_month)` variabels and `r nrow(pols_month)` observations. Years for which we have data: `r pols_month[1,1]` to `r pols_month[822,1]`.
 
 Cleaning the snp data:
 
@@ -209,7 +209,7 @@ snp_data = read_csv(file = "./data/snp.csv") %>%
   
 ```
 
-SNP - Standard & Poor's stock market index (S&P) data is used as a representative measure of stock market as a whole. This dataset had two variables: date and close (the closing values of the S&P stock index on the associated date), and `r ncol(snp_data)` observations.
+SNP - Standard & Poor's stock market index (S&P) data is used as a representative measure of stock market as a whole. This dataset has variables: month, year and close (the closing values of the S&P stock index on the associated date), and `r nrow(snp_data)` observations. Years for which we have data: `r snp_data[1,1]` to `r snp_data[787,1]`.
 
 Cleaning the unemployement data:
 
@@ -237,5 +237,21 @@ tidy_unemployment = unemployment_data %>%
   arrange(year, month)
 ```
 
-This dataset contains the percentage of employment per month in a particular year. It contains the variables: year, month and umployment (%). The cleaned version of the dataset has `r ncol(tidy_unemployment)` observations.
+This dataset contains the percentage of employment per month in a particular year. It contains the variables: year, month and umployment (%). Years for which we have data: `r tidy_unemployment[1,1]` to `r tidy_unemployment[816,1]`. The cleaned version of the dataset has `r nrow(tidy_unemployment)` observations.
 
+
+##### Merging the datasets
+
+```{r}
+merge_1 = 
+  left_join(pols_month, snp_data, by = c("year", "month")) %>% 
+  
+  mutate(
+    year = as.numeric(year))
+
+
+merge_2 = left_join(merge_1, tidy_unemployment, by = c("year", "month"))
+```
+
+This dataset contains information about the president (democratic or republic), unemployment percentages, and S&P stock index per month with associated years, starting from `r merge_2[1,1]` to `r merge_2[822,1]`. 
+The final, cleaned version of the combined dataset has `r ncol(merge_2)` variables and `r nrow(merge_2)` observations.
